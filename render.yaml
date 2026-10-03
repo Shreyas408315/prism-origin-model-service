@@ -1,0 +1,12 @@
+services:
+  - type: pserv
+    name: prism-origin-model
+    runtime: docker
+    dockerfilePath: Dockerfile
+    plan: starter
+    region: oregon
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8000

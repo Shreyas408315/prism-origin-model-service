@@ -1,0 +1,10 @@
+.venv
+.venv_win
+__pycache__
+*.pyc
+.git
+tests
+scripts
+examples
+README.md
+*.csv
