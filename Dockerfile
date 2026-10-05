@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy the rest of the application
 COPY app/ ./app/
-COPY model/ ./model/
+COPY model/eslint_surface_hybrid_ensemble.joblib ./model/
 COPY model_schema.json .
 
 # Expose port (Cloud providers like Render use the PORT env var)

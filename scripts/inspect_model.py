@@ -1,39 +1,37 @@
-import joblib
-import json
+"""Inspect the configured ESLint surface hybrid ensemble artifact."""
 
-def main():
-    model_path = "model/prism_ensemble_clean.joblib"
-    print(f"Loading artifact from: {model_path}")
-    
+import json
+import os
+from pathlib import Path
+
+import joblib
+
+
+def main() -> None:
+    service_dir = Path(__file__).resolve().parents[1]
+    model_path = Path(
+        os.environ.get(
+            "MODEL_PATH",
+            service_dir / "model" / "eslint_surface_hybrid_ensemble.joblib",
+        )
+    )
+    schema = json.loads((service_dir / "model_schema.json").read_text(encoding="utf-8"))
     artifact = joblib.load(model_path)
-    
-    print("\n==================================================")
-    print("MODEL ARTIFACT METADATA")
-    print("==================================================")
-    print(f"Type: {type(artifact)}")
-    
-    if isinstance(artifact, dict):
-        print(f"Keys: {list(artifact.keys())}")
-        
-        print("\n--- Features ---")
-        features = artifact.get("features", [])
-        print(f"Count: {len(features)}")
-        print(f"Names: {features}")
-        
-        print("\n--- Configuration ---")
-        print(f"Threshold: {artifact.get('threshold')}")
-        print(f"Positive Class: {artifact.get('positive_class')}")
-        
-        print("\n--- Components ---")
-        models = artifact.get("models", {})
-        print(f"Component count: {len(models)}")
-        for name, comp in models.items():
-            print(f"  - {name}: {type(comp)}")
-            
-        print("\n--- Weights ---")
-        print(artifact.get("weights"))
-    else:
-        print("Artifact is not a dictionary.")
+
+    print(f"Artifact: {model_path}")
+    print(f"Model version: {schema['model_version']}")
+    print(f"Task: {schema['task']}")
+    print(f"Positive class: {schema['positive_class']}")
+    print(f"Threshold: {artifact['threshold']}")
+    print(f"Artifact feature count: {len(artifact['categorical_cols']) + len(artifact['numeric_cols']) + 1}")
+    print(f"API input feature count: {schema['api_feature_count']}")
+    print(f"Text feature: message (TF-IDF)")
+    print(f"Categorical features: {artifact['categorical_cols']}")
+    print(f"Numeric feature count: {len(artifact['numeric_cols'])}")
+    print(f"Components: { {name: type(model).__name__ for name, model in artifact['models'].items()} }")
+    print(f"Weights: {artifact['weights']}")
+    print(f"Label classes: {list(artifact['label_encoder'].classes_)}")
+
 
 if __name__ == "__main__":
     main()
